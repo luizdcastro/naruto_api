@@ -13,6 +13,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
-app.use('/api/vi/shinobis', shinobiRouter);
+app.use('/api/v1/shinobis', shinobiRouter);
 
 module.exports = app;
