@@ -1,5 +1,6 @@
-# dependencies
+git commit # dependencies
 /node_modules
+/data
 .config.env
 .prettierrc
 
