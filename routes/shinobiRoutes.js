@@ -3,6 +3,8 @@ const shinobiController = require('./../controller/shinobiController');
 
 const router = express.Router();
 
+router.route('/team-random').get(shinobiController.teamRandom);
+
 router
   .route('/')
   .get(shinobiController.getAllShinobis)

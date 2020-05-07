@@ -1,8 +1,16 @@
 const Shinobi = require('./../model/shinobiModels');
+const APIFeatures = require('./../utils/apiFeatures');
 
 exports.getAllShinobis = async (req, res) => {
   try {
-    const shinobi = await Shinobi.find();
+    const features = new APIFeatures(Shinobi.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const shinobi = await features.query;
+
     res.status(200).json({
       status: 'success',
       results: shinobi.length,
@@ -54,14 +62,10 @@ exports.getShinobi = async (req, res) => {
 
 exports.updateShinobi = async (req, res) => {
   try {
-    const shinobi = await Shinobi.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    const shinobi = await Shinobi.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
     res.status(200).json({
       status: 'success',
       data: {
@@ -82,6 +86,34 @@ exports.deleteShinobi = async (req, res) => {
     res.status(204).json({
       status: 'success',
       data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.teamRandom = async (req, res) => {
+  try {
+    const random = await Shinobi.aggregate([
+      {
+        $sample: { size: 3 },
+      },
+      {
+        $group: {
+          _id: '$name',
+          clan: { $first: '$clan' },
+          rank: { $first: '$rank' },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        random,
+      },
     });
   } catch (err) {
     res.status(404).json({
