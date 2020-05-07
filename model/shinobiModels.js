@@ -27,6 +27,10 @@ const shinobiSchema = new mongoose.Schema({
     type: [String],
     trim: true,
   },
+  team: {
+    type: [String],
+    trim: true,
+  },
   jutsu: {
     type: [String],
     trim: true,
