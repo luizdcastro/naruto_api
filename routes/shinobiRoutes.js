@@ -5,6 +5,8 @@ const router = express.Router();
 
 router.route('/team-random').get(shinobiController.teamRandom);
 
+router.route('/team-custom').get(shinobiController.teamCustom);
+
 router
   .route('/')
   .get(shinobiController.getAllShinobis)

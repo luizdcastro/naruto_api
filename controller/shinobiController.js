@@ -103,7 +103,8 @@ exports.teamRandom = async (req, res) => {
       },
       {
         $group: {
-          _id: '$name',
+          _id: '$_id',
+          name: { $first: '$name' },
           clan: { $first: '$clan' },
           rank: { $first: '$rank' },
         },
@@ -113,6 +114,37 @@ exports.teamRandom = async (req, res) => {
       status: 'success',
       data: {
         random,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
+
+exports.teamCustom = async (req, res) => {
+  try {
+    const custom = await Shinobi.aggregate([
+      {
+        $match: req.body,
+      },
+      {
+        $sample: { size: 3 },
+      },
+      {
+        $group: {
+          _id: '$name',
+          clan: { $first: '$clan' },
+          rank: { $first: '$rank' },
+        },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        custom,
       },
     });
   } catch (err) {
