@@ -1,8 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const AppError = require('/utils/appError');
-const globalErrorHandler = require('./controllers/errorController');
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controller/errorController');
 const shinobiRouter = require('./routes/shinobiRoutes');
 
 const app = express();

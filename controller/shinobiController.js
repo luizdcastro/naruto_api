@@ -1,156 +1,117 @@
 const Shinobi = require('./../model/shinobiModels');
 const APIFeatures = require('./../utils/apiFeatures');
+const catchAsync = require('./../utils/catchAsync');
 
-exports.getAllShinobis = async (req, res) => {
-  try {
-    const features = new APIFeatures(Shinobi.find(), req.query)
-      .filter()
-      .sort()
-      .limitFields()
-      .paginate();
+exports.getAllShinobis = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(Shinobi.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-    const shinobi = await features.query;
+  const shinobi = await features.query;
 
-    res.status(200).json({
-      status: 'success',
-      results: shinobi.length,
-      data: {
-        shinobi,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+  res.status(200).json({
+    status: 'success',
+    results: shinobi.length,
+    data: {
+      shinobi,
+    },
+  });
+});
+
+exports.createShinobi = catchAsync(async (req, res, next) => {
+  const newShonobi = await Shinobi.create(req.body);
+  res.status(201).json({
+    status: 'success',
+    data: {
+      shinobi: newShonobi,
+    },
+  });
+});
+
+exports.getShinobi = catchAsync(async (req, res, next) => {
+  const shinobi = await Shinobi.findById(req.params.id);
+
+  if (!shinobi) {
+    return next(new AppError('No shinobi found with that ID', 404));
   }
-};
 
-exports.createShinobi = async (req, res) => {
-  try {
-    const newShonobi = await Shinobi.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      data: {
-        shinobi: newShonobi,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    data: {
+      shinobi,
+    },
+  });
+});
 
-exports.getShinobi = async (req, res) => {
-  try {
-    const shinobi = await Shinobi.findById(req.params.id);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        shinobi,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
+exports.updateShinobi = catchAsync(async (req, res, next) => {
+  const shinobi = await Shinobi.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-exports.updateShinobi = async (req, res) => {
-  try {
-    const shinobi = await Shinobi.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    res.status(200).json({
-      status: 'success',
-      data: {
-        shinobi,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+  if (!shinobi) {
+    return next(new AppError('No shinobi found with that ID', 404));
   }
-};
 
-exports.deleteShinobi = async (req, res) => {
-  try {
-    const shinobi = await Shinobi.findByIdAndDelete(req.params.id);
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    data: {
+      shinobi,
+    },
+  });
+});
 
-exports.teamRandom = async (req, res) => {
-  try {
-    const random = await Shinobi.aggregate([
-      {
-        $sample: { size: 3 },
-      },
-      {
-        $group: {
-          _id: '$_id',
-          name: { $first: '$name' },
-          clan: { $first: '$clan' },
-          rank: { $first: '$rank' },
-        },
-      },
-    ]);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        random,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  }
-};
+exports.deleteShinobi = catchAsync(async (req, res, next) => {
+  const shinobi = await Shinobi.findByIdAndDelete(req.params.id);
 
-exports.teamCustom = async (req, res) => {
-  try {
-    const custom = await Shinobi.aggregate([
-      {
-        $match: req.body,
-      },
-      {
-        $sample: { size: 3 },
-      },
-      {
-        $group: {
-          _id: '$name',
-          clan: { $first: '$clan' },
-          rank: { $first: '$rank' },
-        },
-      },
-    ]);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        custom,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
+  if (!shinobi) {
+    return next(new AppError('No shinobi found with that ID', 404));
   }
-};
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
+exports.teamRandom = catchAsync(async (req, res, next) => {
+  const random = await Shinobi.aggregate([
+    { $sample: { size: 3 } },
+    {
+      $group: {
+        _id: '$_id',
+        name: { $first: '$name' },
+        clan: { $first: '$clan' },
+        rank: { $first: '$rank' },
+      },
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      random,
+    },
+  });
+});
+
+exports.teamCustom = catchAsync(async (req, res) => {
+  const custom = await Shinobi.aggregate([
+    { $match: req.body },
+    { $sample: { size: 3 } },
+    {
+      $group: {
+        _id: '$name',
+        clan: { $first: '$clan' },
+        rank: { $first: '$rank' },
+      },
+    },
+  ]);
+  res.status(200).json({
+    status: 'success',
+    data: {
+      custom,
+    },
+  });
+});
