@@ -1,24 +1,9 @@
 const Shinobi = require('./../model/shinobiModels');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
+const factory = require('./handlerFactory');
 
-exports.getAllShinobis = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Shinobi.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const shinobi = await features.query;
-
-  res.status(200).json({
-    status: 'success',
-    results: shinobi.length,
-    data: {
-      shinobi,
-    },
-  });
-});
+exports.getAllShinobis = factory.getAll(Shinobi);
 
 exports.createShinobi = catchAsync(async (req, res, next) => {
   const newShonobi = await Shinobi.create(req.body);
