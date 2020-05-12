@@ -1,41 +1,13 @@
 const Mission = require('./../model/missionModel');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
+const factory = require('./handlerFactory');
 
-exports.createMission = catchAsync(async (req, res, next) => {
-  const mission = await Mission.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      mission,
-    },
-  });
-});
-
-exports.getAllMissions = catchAsync(async (req, res, next) => {
-  const mission = await Mission.find(req.query);
-
-  res.status(200).json({
-    status: 'success',
-    results: mission.length,
-    data: {
-      mission,
-    },
-  });
-});
-
-exports.getMission = catchAsync(async (req, res, next) => {
-  const mission = await Mission.findById(req.params.id);
-
-  res.status(200).json({
-    status: 'success',
-    results: mission.length,
-    data: {
-      mission,
-    },
-  });
-});
+exports.createMission = factory.createOne(Mission);
+exports.getAllMissions = factory.getAll(Mission);
+exports.getMission = factory.getOne(Mission);
+exports.updateMission = factory.updateOne(Mission);
+exports.deleteMission = factory.deleteOne(Mission);
 
 exports.RemoveShinobis = catchAsync(async (req, res, next) => {
   const shinobiUpdate = await Mission.findByIdAndUpdate(req.params.id, {
