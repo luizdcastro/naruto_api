@@ -64,7 +64,7 @@ exports.updateShinobi = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteShinobi = catchAsync(async (req, res, next) => {
-  const shinobi = await Shinobi.findByIdAndDelete(req.params.id);
+  const shinobi = await Shinobi.find(req.params.id);
 
   if (!shinobi) {
     return next(new AppError('No shinobi found with that ID', 404));
